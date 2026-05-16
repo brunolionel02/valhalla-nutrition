@@ -12,6 +12,17 @@ const firebaseConfig = {
 const _app = initializeApp(firebaseConfig);
 const _db  = getFirestore(_app);
 
+function sanitizar(texto) {
+  return texto.trim()
+    .replace(/</g, '')
+    .replace(/>/g, '')
+    .replace(/"/g, '')
+    .replace(/'/g, '')
+    .replace(/javascript:/gi, '')
+    .replace(/on\w+=/gi, '')
+    .substring(0, 200);
+}
+
 // ===== PRODUCTOS =====
 const productos = [
   // PROTEÍNAS — potes con imagen real
@@ -439,9 +450,9 @@ document.getElementById('envioModalCancelar').addEventListener('click', cerrarMo
 document.getElementById('envioModalOverlay').addEventListener('click', cerrarModalEnvio);
 
 document.getElementById('envioModalContinuar').addEventListener('click', () => {
-  const nombre    = document.getElementById('inputNombre').value.trim();
-  const direccion = document.getElementById('inputDireccion').value.trim();
-  const localidad = document.getElementById('inputLocalidad').value.trim();
+  const nombre    = sanitizar(document.getElementById('inputNombre').value);
+  const direccion = sanitizar(document.getElementById('inputDireccion').value);
+  const localidad = sanitizar(document.getElementById('inputLocalidad').value);
   if (!nombre || !direccion || !localidad) {
     document.getElementById('envioModalError').style.display = 'block';
     return;
