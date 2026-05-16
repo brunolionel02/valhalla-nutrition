@@ -188,8 +188,8 @@ function renderProductos() {
 
     card.querySelector('.btn-add').addEventListener('click', () => agregarAlCarrito(p.id));
     card.querySelector('.btn-consultar').addEventListener('click', () => {
-      const msg = `Hola Valhalla Nutrition! 👋 Quiero consultar sobre:\n*${p.nombre}* - ${p.marca}\nPrecio: ${formatPrecio(p.precio)}\n¿Tienen stock disponible?`;
-      window.open(`https://wa.me/5491131782187?text=${encodeURIComponent(msg)}`, '_blank', 'noopener,noreferrer');
+      const msg = `Hola Valhalla Nutrition! Quiero consultar sobre:\n${p.nombre} - ${p.marca}\nPrecio: ${formatPrecio(p.precio)}\nTienen stock disponible?`;
+      window.open(`https://wa.me/5491178242892?text=${encodeURIComponent(msg)}`, '_blank', 'noopener,noreferrer');
     });
     productsGrid.appendChild(card);
   });
@@ -424,7 +424,7 @@ function abrirModal() {
   const total         = subtotal + envioEfectivo;
   mpTotal.textContent = formatPrecio(total);
   const btnCompWA = document.getElementById('btnComprobanteWA');
-  if (btnCompWA) btnCompWA.href = `https://wa.me/5491131782187?text=${encodeURIComponent(buildMensajePedido(true))}`;
+  if (btnCompWA) btnCompWA.href = `https://wa.me/5491178242892?text=${encodeURIComponent(buildMensajePedido(true))}`;
   modalOpciones.style.display = 'flex';
   modalMpPanel.style.display  = 'none';
   modalOverlay.classList.add('open');
@@ -461,8 +461,8 @@ function buildMensajePedido(conPago) {
   const total         = subtotal + envioEfectivo;
   const lineas        = carrito.map(i => `- ${i.cantidad}x ${i.nombre} - ${formatPrecio(i.precio * i.cantidad)}`).join('\n');
   const envioTexto    = !cpDestino ? 'A coordinar' : envioEsGratis ? 'GRATIS 🎉' : formatPrecio(envioEfectivo);
-  const pagoLinea     = conPago ? '\n💳 Quiero pagar por WhatsApp / Mercado Pago' : '';
-  return `Hola Valhalla Nutrition! 🛒 Quiero hacer el siguiente pedido:\n\n${lineas}\n\n💰 Subtotal: ${formatPrecio(subtotal)}\n🚚 Envío: ${envioTexto}\n💵 TOTAL: ${formatPrecio(total)}${pagoLinea}\n\n¿Cómo procedo con el pago?`;
+  const pagoLinea     = conPago ? '\nQuiero pagar por WhatsApp / Mercado Pago' : '';
+  return `Hola Valhalla Nutrition! Quiero hacer el siguiente pedido:\n\n${lineas}\n\nSubtotal: ${formatPrecio(subtotal)}\nEnvio: ${envioTexto}\nTOTAL: ${formatPrecio(total)}${pagoLinea}\n\nComo procedo con el pago?`;
 }
 
 // Registro de ventas en localStorage + Firestore
@@ -517,16 +517,16 @@ function registrarVenta(medioPago) {
 
 btnCopiarAlias.addEventListener('click', () => {
   registrarVenta('Mercado Pago');
-  navigator.clipboard.writeText('brunolionel').then(() => {
+  navigator.clipboard.writeText('valnuar').then(() => {
     const orig = btnCopiarAlias.innerHTML;
     btnCopiarAlias.textContent = '✓ Alias copiado';
     setTimeout(() => { btnCopiarAlias.innerHTML = orig; }, 2000);
-  }).catch(() => mostrarToast('No se pudo copiar. Alias: brunolionel'));
+  }).catch(() => mostrarToast('No se pudo copiar. Alias: valnuar'));
 });
 
 btnElegirWA.addEventListener('click', () => {
   registrarVenta('WhatsApp');
-  window.open(`https://wa.me/5491131782187?text=${encodeURIComponent(buildMensajePedido(false))}`, '_blank', 'noopener,noreferrer');
+  window.open(`https://wa.me/5491178242892?text=${encodeURIComponent(buildMensajePedido(false))}`, '_blank', 'noopener,noreferrer');
   cerrarModal();
 });
 
