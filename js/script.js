@@ -1,4 +1,16 @@
-'use strict';
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+import { getFirestore, collection, addDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+
+const firebaseConfig = {
+  apiKey: "AIzaSyCmAvx7uNOXZil9hOl-CM8PwwsbZiRWUbk",
+  authDomain: "valhalla-suplementos.firebaseapp.com",
+  projectId: "valhalla-suplementos",
+  storageBucket: "valhalla-suplementos.firebasestorage.app",
+  messagingSenderId: "745478523635",
+  appId: "1:745478523635:web:0b914da19c2cb292a38586"
+};
+const _app = initializeApp(firebaseConfig);
+const _db  = getFirestore(_app);
 
 // ===== PRODUCTOS =====
 const productos = [
@@ -456,8 +468,7 @@ function buildMensajePedido(conPago) {
 // Registro de ventas en localStorage + Firestore
 async function registrarVentaFirestore(venta) {
   try {
-    if (!window.db) return;
-    const docRef = await window.firestoreAdd(window.firestoreCollection(window.db, 'ventas'), {
+    const docRef = await addDoc(collection(_db, 'ventas'), {
       fechaISO:  venta.fechaISO,
       fecha:     venta.fecha,
       hora:      venta.hora,
@@ -467,7 +478,7 @@ async function registrarVentaFirestore(venta) {
       cpDestino: venta.cpDestino || null,
       medioPago: venta.medioPago,
       estado:    'Pendiente',
-      timestamp: window.firestoreTimestamp()
+      timestamp: serverTimestamp()
     });
     // Marcar el registro local con el ID de Firestore para deduplicación
     const ventas = JSON.parse(localStorage.getItem('valhallaVentas') || '[]');
