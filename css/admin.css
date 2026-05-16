@@ -551,6 +551,33 @@ body {
   margin-bottom: 1rem;
 }
 
+.toolbar-right {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+}
+
+.live-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 0.65rem;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+  color: #e74c3c;
+  padding: 0.28rem 0.65rem;
+  border: 1px solid rgba(231,76,60,0.3);
+  border-radius: 20px;
+  background: rgba(231,76,60,0.08);
+  white-space: nowrap;
+  animation: livePulse 2s ease-in-out infinite;
+}
+
+@keyframes livePulse {
+  0%, 100% { opacity: 1; }
+  50%       { opacity: 0.55; }
+}
+
 .filters-row {
   display: flex;
   flex-wrap: wrap;

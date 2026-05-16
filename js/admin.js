@@ -1,4 +1,17 @@
-'use strict';
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+import { getFirestore, collection, doc, updateDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+
+const firebaseConfig = {
+  apiKey: "AIzaSyCmAvx7uNOXZil9hOl-CM8PwwsbZiRWUbk",
+  authDomain: "valhalla-suplementos.firebaseapp.com",
+  projectId: "valhalla-suplementos",
+  storageBucket: "valhalla-suplementos.firebasestorage.app",
+  messagingSenderId: "745478523635",
+  appId: "1:745478523635:web:0b914da19c2cb292a38586"
+};
+
+const firebaseApp = initializeApp(firebaseConfig);
+const db          = getFirestore(firebaseApp);
 
 // ===== CONSTANTES =====
 const PASS              = 'valhalla2024';
@@ -67,6 +80,38 @@ function getProveedores() {
 }
 function setProveedores(p) { localStorage.setItem('valhallaProveedores', JSON.stringify(p)); }
 
+// ===== FIRESTORE =====
+let ventasFirestore        = [];
+let firestoreListenerSetup = false;
+
+function getVentasCombinadas() {
+  // Firestore es la fuente principal; el localStorage aporta solo las ventas
+  // históricas que no tienen firestoreId (registradas antes de la integración)
+  const local   = getVentas();
+  const legacy  = local.filter(v => !v.firestoreId);
+  const combined = [...ventasFirestore, ...legacy];
+  combined.sort((a, b) => new Date(b.fechaISO || 0) - new Date(a.fechaISO || 0));
+  return combined;
+}
+
+function setupFirestore() {
+  if (firestoreListenerSetup) return;
+  firestoreListenerSetup = true;
+  try {
+    onSnapshot(collection(db, 'ventas'), snapshot => {
+      ventasFirestore = snapshot.docs.map(d => ({ firestoreId: d.id, ...d.data() }));
+      ventasFirestore.sort((a, b) => new Date(b.fechaISO || 0) - new Date(a.fechaISO || 0));
+      const badge = document.getElementById('liveBadge');
+      if (badge) badge.style.display = 'inline-flex';
+      if (document.getElementById('secVentas').style.display  !== 'none') renderVentas();
+      if (document.getElementById('secResumen').style.display !== 'none') renderResumen();
+    }, () => {
+      const badge = document.getElementById('liveBadge');
+      if (badge) badge.style.display = 'none';
+    });
+  } catch(e) {}
+}
+
 // ===== LOGIN =====
 function checkAuth() {
   localStorage.getItem('valhallaAuth') === 'true' ? showDashboard() : showLogin();
@@ -82,6 +127,7 @@ function showLogin() {
 function showDashboard() {
   document.getElementById('loginScreen').style.display = 'none';
   document.getElementById('dashboard').style.display   = 'flex';
+  setupFirestore();
   navTo('resumen');
 }
 
@@ -141,7 +187,7 @@ function closeSidebar() {
 
 // ===== RESUMEN =====
 function renderResumen() {
-  const ventas = getVentas();
+  const ventas = getVentasCombinadas();
   const hoy    = new Date().toISOString().split('T')[0];
   const from   = getPeriodoFrom();
 
@@ -256,7 +302,7 @@ function getPeriodoFrom() {
 
 function getVentasFiltradas() {
   const from = getPeriodoFrom();
-  let v = getVentas().filter(x => x.fechaISO && new Date(x.fechaISO) >= from);
+  let v = getVentasCombinadas().filter(x => x.fechaISO && new Date(x.fechaISO) >= from);
   if (filtroFecha)     v = v.filter(x => x.fechaISO && x.fechaISO.startsWith(filtroFecha));
   if (filtroEstado)    v = v.filter(x => x.estado    === filtroEstado);
   if (filtroMedioPago) v = v.filter(x => x.medioPago === filtroMedioPago);
@@ -287,6 +333,7 @@ function renderVentas() {
     const totalHtml   = cancelado
       ? `<span class="total-cancelado">${formatPrecio(totalFinal)}</span><span class="badge-cancelado">CANCELADO</span>`
       : `<span style="color:var(--white);font-weight:700;">${formatPrecio(totalFinal)}</span>`;
+    const uid = v.firestoreId || String(v.id);
 
     return `<tr class="${rowClass}">
       <td>${v.fecha || '—'}</td>
@@ -296,7 +343,7 @@ function renderVentas() {
       <td>${envioText}</td>
       <td><span class="mp-badge ${mpClass}">${mpIcon} ${v.medioPago}</span></td>
       <td>
-        <select class="estado-select st-${est}" data-id="${v.id}">
+        <select class="estado-select st-${est}" data-id="${uid}">
           <option value="Pendiente"  ${est === 'Pendiente'  ? 'selected' : ''}>🟡 Pendiente</option>
           <option value="Confirmado" ${est === 'Confirmado' ? 'selected' : ''}>🔵 Confirmado</option>
           <option value="Enviado"    ${est === 'Enviado'    ? 'selected' : ''}>🚚 Enviado</option>
@@ -309,15 +356,23 @@ function renderVentas() {
 
   tbody.querySelectorAll('.estado-select').forEach(sel => {
     sel.addEventListener('change', () => {
-      cambiarEstado(parseInt(sel.dataset.id), sel.value);
+      cambiarEstado(sel.dataset.id, sel.value);
       renderVentas();
     });
   });
 }
 
-function cambiarEstado(id, estado) {
+async function cambiarEstado(id, estado) {
+  // Si es una venta de Firestore, actualizar en la nube
+  const fv = ventasFirestore.find(v => v.firestoreId === id);
+  if (fv) {
+    fv.estado = estado;
+    try { await updateDoc(doc(db, 'ventas', id), { estado }); } catch(e) {}
+    return;
+  }
+  // Fallback: localStorage
   const ventas = getVentas();
-  const v      = ventas.find(x => x.id === id);
+  const v = ventas.find(x => String(x.id) === String(id));
   if (v) { v.estado = estado; setVentas(ventas); }
 }
 

@@ -9,6 +9,24 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700;900&family=Montserrat:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="css/styles.css" />
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+    import { getFirestore, collection, addDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+    const firebaseConfig = {
+      apiKey: "AIzaSyCmAvx7uNOXZil9hOl-CM8PwwsbZiRWUbk",
+      authDomain: "valhalla-suplementos.firebaseapp.com",
+      projectId: "valhalla-suplementos",
+      storageBucket: "valhalla-suplementos.firebasestorage.app",
+      messagingSenderId: "745478523635",
+      appId: "1:745478523635:web:0b914da19c2cb292a38586"
+    };
+    const app = initializeApp(firebaseConfig);
+    const db  = getFirestore(app);
+    window.db                  = db;
+    window.firestoreAdd        = addDoc;
+    window.firestoreCollection = collection;
+    window.firestoreTimestamp  = serverTimestamp;
+  </script>
 </head>
 <body>
 

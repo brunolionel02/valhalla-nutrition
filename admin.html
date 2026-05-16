@@ -117,7 +117,10 @@
           </select>
           <button id="btnLimpiarFiltros" class="btn-secondary">Limpiar</button>
         </div>
-        <button id="btnExportarCSV" class="btn-gold">⬇ Exportar CSV</button>
+        <div class="toolbar-right">
+          <span class="live-badge" id="liveBadge" style="display:none;">🔴 En vivo</span>
+          <button id="btnExportarCSV" class="btn-gold">⬇ Exportar CSV</button>
+        </div>
       </div>
       <div class="periodo-row">
         <button class="periodo-btn" data-periodo="semanal">SEMANAL</button>
@@ -227,6 +230,6 @@
   </div>
 </div>
 
-<script src="js/admin.js"></script>
+<script type="module" src="js/admin.js"></script>
 </body>
 </html>

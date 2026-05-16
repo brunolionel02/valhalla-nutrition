@@ -453,7 +453,34 @@ function buildMensajePedido(conPago) {
   return `Hola Valhalla Nutrition! 🛒 Quiero hacer el siguiente pedido:\n\n${lineas}\n\n💰 Subtotal: ${formatPrecio(subtotal)}\n🚚 Envío: ${envioTexto}\n💵 TOTAL: ${formatPrecio(total)}${pagoLinea}\n\n¿Cómo procedo con el pago?`;
 }
 
-// Registro de ventas en localStorage
+// Registro de ventas en localStorage + Firestore
+async function registrarVentaFirestore(venta) {
+  try {
+    if (!window.db) return;
+    const docRef = await window.firestoreAdd(window.firestoreCollection(window.db, 'ventas'), {
+      fechaISO:  venta.fechaISO,
+      fecha:     venta.fecha,
+      hora:      venta.hora,
+      productos: venta.productos,
+      total:     venta.total,
+      envio:     venta.envio,
+      cpDestino: venta.cpDestino || null,
+      medioPago: venta.medioPago,
+      estado:    'Pendiente',
+      timestamp: window.firestoreTimestamp()
+    });
+    // Marcar el registro local con el ID de Firestore para deduplicación
+    const ventas = JSON.parse(localStorage.getItem('valhallaVentas') || '[]');
+    const idx = ventas.findIndex(v => v.id === venta.id);
+    if (idx !== -1) {
+      ventas[idx].firestoreId = docRef.id;
+      localStorage.setItem('valhallaVentas', JSON.stringify(ventas));
+    }
+  } catch(e) {
+    console.log('Error guardando venta en Firestore:', e);
+  }
+}
+
 function registrarVenta(medioPago) {
   const subtotal      = carrito.reduce((s, i) => s + i.precio * i.cantidad, 0);
   const envioEsGratis = cpDestino && subtotal >= ENVIO_GRATIS_DESDE;
@@ -474,6 +501,7 @@ function registrarVenta(medioPago) {
   const ventas = JSON.parse(localStorage.getItem('valhallaVentas') || '[]');
   ventas.unshift(venta);
   localStorage.setItem('valhallaVentas', JSON.stringify(ventas));
+  registrarVentaFirestore(venta); // async, fire-and-forget
 }
 
 btnCopiarAlias.addEventListener('click', () => {
