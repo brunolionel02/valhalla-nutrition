@@ -72,6 +72,7 @@ let busqueda = '';
 let costoEnvio = 0;
 let cpDestino  = '';
 const ENVIO_GRATIS_DESDE = 40000;
+let datosEnvio = { nombre: '', direccion: '', localidad: '' };
 
 function calcularZonaEnvio(cp) {
   const n = parseInt(cp, 10);
@@ -417,6 +418,39 @@ const btnElegirWA    = document.getElementById('btnElegirWA');
 const btnCopiarAlias = document.getElementById('btnCopiarAlias');
 const mpTotal        = document.getElementById('mpTotal');
 
+function abrirModalEnvio() {
+  const overlay = document.getElementById('envioModalOverlay');
+  const modal   = document.getElementById('modalDatosEnvio');
+  document.getElementById('inputNombre').value    = datosEnvio.nombre;
+  document.getElementById('inputDireccion').value = datosEnvio.direccion;
+  document.getElementById('inputLocalidad').value = datosEnvio.localidad;
+  document.getElementById('envioModalError').style.display = 'none';
+  overlay.classList.add('open');
+  modal.classList.add('open');
+}
+
+function cerrarModalEnvio() {
+  document.getElementById('envioModalOverlay').classList.remove('open');
+  document.getElementById('modalDatosEnvio').classList.remove('open');
+}
+
+document.getElementById('envioModalClose').addEventListener('click', cerrarModalEnvio);
+document.getElementById('envioModalCancelar').addEventListener('click', cerrarModalEnvio);
+document.getElementById('envioModalOverlay').addEventListener('click', cerrarModalEnvio);
+
+document.getElementById('envioModalContinuar').addEventListener('click', () => {
+  const nombre    = document.getElementById('inputNombre').value.trim();
+  const direccion = document.getElementById('inputDireccion').value.trim();
+  const localidad = document.getElementById('inputLocalidad').value.trim();
+  if (!nombre || !direccion || !localidad) {
+    document.getElementById('envioModalError').style.display = 'block';
+    return;
+  }
+  datosEnvio = { nombre, direccion, localidad };
+  cerrarModalEnvio();
+  abrirModal();
+});
+
 function abrirModal() {
   const subtotal      = carrito.reduce((s, i) => s + i.precio * i.cantidad, 0);
   const envioEsGratis = cpDestino && subtotal >= ENVIO_GRATIS_DESDE;
@@ -440,7 +474,7 @@ modalClose.addEventListener('click', cerrarModal);
 modalOverlay.addEventListener('click', cerrarModal);
 
 document.addEventListener('keydown', e => {
-  if (e.key === 'Escape') { cerrarModal(); cerrarCarrito(); }
+  if (e.key === 'Escape') { cerrarModalEnvio(); cerrarModal(); cerrarCarrito(); }
 });
 
 btnElegirMP.addEventListener('click', () => {
@@ -462,7 +496,10 @@ function buildMensajePedido(conPago) {
   const lineas        = carrito.map(i => `- ${i.cantidad}x ${i.nombre} - ${formatPrecio(i.precio * i.cantidad)}`).join('\n');
   const envioTexto    = !cpDestino ? 'A coordinar' : envioEsGratis ? 'GRATIS 🎉' : formatPrecio(envioEfectivo);
   const pagoLinea     = conPago ? '\nQuiero pagar por WhatsApp / Mercado Pago' : '';
-  return `Hola Valhalla Nutrition! Quiero hacer el siguiente pedido:\n\n${lineas}\n\nSubtotal: ${formatPrecio(subtotal)}\nEnvio: ${envioTexto}\nTOTAL: ${formatPrecio(total)}${pagoLinea}\n\nComo procedo con el pago?`;
+  const envioDataLinea = datosEnvio.nombre
+    ? `\n\nDatos de envio:\nNombre: ${datosEnvio.nombre}\nDireccion: ${datosEnvio.direccion}\nLocalidad: ${datosEnvio.localidad}`
+    : '';
+  return `Hola Valhalla Nutrition! Quiero hacer el siguiente pedido:\n\n${lineas}\n\nSubtotal: ${formatPrecio(subtotal)}\nEnvio: ${envioTexto}\nTOTAL: ${formatPrecio(total)}${pagoLinea}${envioDataLinea}\n\nComo procedo con el pago?`;
 }
 
 // Registro de ventas en localStorage + Firestore
@@ -567,7 +604,7 @@ document.getElementById('cpInput').addEventListener('keydown', e => {
 
 btnWhatsapp.addEventListener('click', () => {
   if (!carrito.length) return;
-  abrirModal();
+  abrirModalEnvio();
 });
 
 // Navbar hamburger
