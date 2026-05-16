@@ -1,0 +1,12 @@
+{
+  "permissions": {
+    "allow": [
+      "PowerShell(New-Item -ItemType Directory -Force -Path \"c:\\\\Users\\\\Administrator\\\\Desktop\\\\pagina suplementos valhala nutricion\\\\css\")",
+      "PowerShell(New-Item -ItemType Directory -Force -Path \"c:\\\\Users\\\\Administrator\\\\Desktop\\\\pagina suplementos valhala nutricion\\\\js\")",
+      "PowerShell(New-Item -ItemType Directory -Force -Path \"c:\\\\Users\\\\Administrator\\\\Desktop\\\\pagina suplementos valhala nutricion\\\\assets\\\\images\")",
+      "PowerShell(New-Item -ItemType Directory -Force -Path \"c:\\\\Users\\\\Administrator\\\\Desktop\\\\pagina suplementos valhala nutricion\\\\assets\\\\icons\")",
+      "PowerShell(Move-Item -Path \"c:\\\\Users\\\\Administrator\\\\Desktop\\\\pagina suplementos valhala nutricion\\\\download.jpeg\" -Destination \"c:\\\\Users\\\\Administrator\\\\Desktop\\\\pagina suplementos valhala nutricion\\\\assets\\\\images\\\\download.jpeg\")",
+      "PowerShell(Get-ChildItem -Path \"c:\\\\Users\\\\Administrator\\\\Desktop\\\\pagina suplementos valhala nutricion\" -Recurse | Where-Object { !$_.PSIsContainer } | Select-Object FullName | ForEach-Object { $_.FullName.Replace\\(\"c:\\\\Users\\\\Administrator\\\\Desktop\\\\pagina suplementos valhala nutricion\\\\\", \"\"\\) })"
+    ]
+  }
+}

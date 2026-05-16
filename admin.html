@@ -1,0 +1,232 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Valhalla Nutrition - Admin</title>
+  <link rel="icon" type="image/jpeg" href="assets/images/logo.jpeg" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700;900&family=Montserrat:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="css/admin.css" />
+</head>
+<body>
+
+<!-- ===== LOGIN ===== -->
+<div id="loginScreen">
+  <div class="login-card">
+    <div class="login-logo">
+      <img src="assets/images/logo.jpeg" height="90" alt="Valhalla Nutrition ARG" style="display:block;object-fit:contain;" />
+    </div>
+    <p class="login-panel-label">Panel de Administración</p>
+    <form id="loginForm" novalidate>
+      <div class="form-group">
+        <label class="form-label" for="passInput">Contraseña</label>
+        <input type="password" id="passInput" class="form-input" placeholder="••••••••" autocomplete="current-password" />
+      </div>
+      <p class="login-error" id="loginError"></p>
+      <button type="submit" class="btn-gold btn-full">Ingresar</button>
+    </form>
+  </div>
+</div>
+
+<!-- ===== DASHBOARD ===== -->
+<div id="dashboard" style="display:none;">
+
+  <!-- SIDEBAR -->
+  <aside class="sidebar" id="sidebar">
+    <div class="sidebar-logo">
+      <img src="assets/images/logo.jpeg" height="55" alt="Valhalla Nutrition ARG" style="display:block;object-fit:contain;" />
+      <span class="logo-admin-tag">ADMIN</span>
+    </div>
+    <nav class="sidebar-nav">
+      <a class="nav-item" data-sec="resumen"     href="#">📊 Resumen</a>
+      <a class="nav-item" data-sec="ventas"      href="#">💰 Ventas</a>
+      <a class="nav-item" data-sec="stock"       href="#">📦 Stock</a>
+      <a class="nav-item" data-sec="proveedores" href="#">🏭 Proveedores</a>
+    </nav>
+    <button id="logoutBtn" class="btn-logout">← Cerrar sesión</button>
+  </aside>
+
+  <div class="sidebar-overlay" id="sidebarOverlay"></div>
+
+  <!-- MAIN -->
+  <main class="main-content">
+
+    <header class="admin-header">
+      <button class="hamburger-admin" id="hamburgerAdmin" aria-label="Menú">
+        <span></span><span></span><span></span>
+      </button>
+      <h2 class="admin-title" id="adminTitle">Resumen</h2>
+      <button class="btn-logout-header" id="logoutBtnHeader">Salir</button>
+    </header>
+
+    <!-- ===== SECCIÓN RESUMEN ===== -->
+    <section id="secResumen" class="admin-section">
+      <div class="cards-grid">
+        <div class="stat-card">
+          <div class="stat-icon">💰</div>
+          <div class="stat-label" id="statLabelTotal">Total este mes</div>
+          <div class="stat-value" id="statTotalHoy">$0</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-icon">📦</div>
+          <div class="stat-label" id="statLabelPedidos">Pedidos este mes</div>
+          <div class="stat-value" id="statPedidosHoy">0</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-icon">🏆</div>
+          <div class="stat-label">Producto más vendido</div>
+          <div class="stat-value stat-sm" id="statMasVendido">—</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-icon">❌</div>
+          <div class="stat-label">Cancelados hoy</div>
+          <div class="stat-value" id="statCancelados">0</div>
+        </div>
+      </div>
+
+      <div class="chart-card">
+        <h3 class="chart-title" id="chartTitle">Ventas — Este mes (semanas)</h3>
+        <div class="chart-wrap">
+          <div class="chart-bars" id="chartBars"></div>
+        </div>
+        <p class="chart-empty" id="chartEmpty">
+          Aún no hay ventas registradas. Las ventas aparecerán aquí cuando los clientes realicen pedidos.
+        </p>
+      </div>
+    </section>
+
+    <!-- ===== SECCIÓN VENTAS ===== -->
+    <section id="secVentas" class="admin-section" style="display:none;">
+      <div class="section-toolbar">
+        <div class="filters-row">
+          <input type="date" id="filtroFecha" class="filter-input" title="Filtrar por fecha" />
+          <select id="filtroEstado" class="filter-input">
+            <option value="">Todos los estados</option>
+            <option value="Pendiente">🟡 Pendiente</option>
+            <option value="Confirmado">🔵 Confirmado</option>
+            <option value="Enviado">🚚 Enviado</option>
+            <option value="Entregado">✅ Entregado</option>
+            <option value="Cancelado">❌ Cancelado</option>
+          </select>
+          <select id="filtroMedioPago" class="filter-input">
+            <option value="">Todos los medios</option>
+            <option value="WhatsApp">WhatsApp</option>
+            <option value="Mercado Pago">Mercado Pago</option>
+          </select>
+          <button id="btnLimpiarFiltros" class="btn-secondary">Limpiar</button>
+        </div>
+        <button id="btnExportarCSV" class="btn-gold">⬇ Exportar CSV</button>
+      </div>
+      <div class="periodo-row">
+        <button class="periodo-btn" data-periodo="semanal">SEMANAL</button>
+        <button class="periodo-btn active" data-periodo="mensual">MENSUAL</button>
+        <button class="periodo-btn" data-periodo="anual">ANUAL</button>
+      </div>
+      <div class="table-wrap">
+        <table class="admin-table">
+          <thead>
+            <tr>
+              <th>Fecha</th>
+              <th>Hora</th>
+              <th>Productos</th>
+              <th>Total</th>
+              <th>Envío</th>
+              <th>Medio de pago</th>
+              <th>Estado</th>
+            </tr>
+          </thead>
+          <tbody id="tbodyVentas"></tbody>
+        </table>
+      </div>
+      <p class="table-empty" id="ventasEmpty" style="display:none;">No hay ventas que coincidan con los filtros.</p>
+    </section>
+
+    <!-- ===== SECCIÓN STOCK ===== -->
+    <section id="secStock" class="admin-section" style="display:none;">
+      <div class="section-toolbar">
+        <div class="stock-legend">
+          <span class="legend-dot red"></span> Sin stock pronto (≤ 2) &nbsp;&nbsp;
+          <span class="legend-dot orange"></span> Poco stock (≤ 5)
+        </div>
+      </div>
+      <div class="table-wrap">
+        <table class="admin-table">
+          <thead>
+            <tr>
+              <th>Producto</th>
+              <th>Marca</th>
+              <th>Categoría</th>
+              <th>Precio</th>
+              <th>Stock</th>
+              <th>Ajustar</th>
+            </tr>
+          </thead>
+          <tbody id="tbodyStock"></tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- ===== SECCIÓN PROVEEDORES ===== -->
+    <section id="secProveedores" class="admin-section" style="display:none;">
+      <div class="section-toolbar">
+        <button id="btnAgregarProveedor" class="btn-gold">+ Agregar proveedor</button>
+      </div>
+      <div class="table-wrap">
+        <table class="admin-table">
+          <thead>
+            <tr>
+              <th>Proveedor</th>
+              <th>Productos</th>
+              <th>Contacto</th>
+              <th>Última compra</th>
+              <th>Monto</th>
+              <th>Acciones</th>
+            </tr>
+          </thead>
+          <tbody id="tbodyProveedores"></tbody>
+        </table>
+      </div>
+    </section>
+
+  </main>
+</div>
+
+<!-- ===== MODAL PROVEEDOR ===== -->
+<div class="adm-modal-overlay" id="provModal" style="display:none;">
+  <div class="adm-modal-card">
+    <h3 class="adm-modal-title" id="provModalTitle">Agregar proveedor</h3>
+    <form id="provForm" novalidate>
+      <input type="hidden" id="provId" />
+      <div class="form-group">
+        <label class="form-label">Nombre</label>
+        <input type="text" id="provNombre" class="form-input" required />
+      </div>
+      <div class="form-group">
+        <label class="form-label">Productos que vende</label>
+        <input type="text" id="provProductos" class="form-input" />
+      </div>
+      <div class="form-group">
+        <label class="form-label">Contacto</label>
+        <input type="text" id="provContacto" class="form-input" placeholder="Teléfono, email, etc." />
+      </div>
+      <div class="form-group">
+        <label class="form-label">Última compra</label>
+        <input type="date" id="provUltimaCompra" class="form-input" />
+      </div>
+      <div class="form-group">
+        <label class="form-label">Monto última compra ($)</label>
+        <input type="number" id="provMonto" class="form-input" min="0" />
+      </div>
+      <div class="form-actions">
+        <button type="button" id="provCancelar" class="btn-secondary">Cancelar</button>
+        <button type="submit" class="btn-gold">Guardar</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<script src="js/admin.js"></script>
+</body>
+</html>
