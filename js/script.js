@@ -454,7 +454,6 @@ function cerrarModalEnvio() {
   document.getElementById('envioModalOverlay').style.display = 'none';
 }
 
-document.getElementById('envioModalClose').addEventListener('click', cerrarModalEnvio);
 document.getElementById('envioModalCancelar').addEventListener('click', cerrarModalEnvio);
 document.getElementById('envioModalOverlay').addEventListener('click', cerrarModalEnvio);
 
