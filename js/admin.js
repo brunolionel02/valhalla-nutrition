@@ -14,7 +14,14 @@ const firebaseApp = initializeApp(firebaseConfig);
 const db          = getFirestore(firebaseApp);
 
 // ===== CONSTANTES =====
-const PASS              = 'valhalla2024';
+const PASS_HASH = '7d6c657d6e6f7b6c6f2032303234'; // hash simple
+function verificarPass(input) {
+  let hash = '';
+  for (let i = 0; i < input.length; i++) {
+    hash += (input.charCodeAt(i) + 1).toString(16);
+  }
+  return hash === PASS_HASH;
+}
 const ENVIO_GRATIS_DESDE = 40000;
 
 // ===== PRODUCTOS (espejo de script.js — solo campos necesarios) =====
@@ -133,7 +140,7 @@ function showDashboard() {
 
 document.getElementById('loginForm').addEventListener('submit', e => {
   e.preventDefault();
-  if (document.getElementById('passInput').value === PASS) {
+  if (verificarPass(document.getElementById('passInput').value)) {
     localStorage.setItem('valhallaAuth', 'true');
     showDashboard();
   } else {
