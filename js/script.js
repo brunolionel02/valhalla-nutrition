@@ -455,7 +455,9 @@ function cerrarModalEnvio() {
 }
 
 document.getElementById('envioModalCancelar').addEventListener('click', cerrarModalEnvio);
-document.getElementById('envioModalOverlay').addEventListener('click', cerrarModalEnvio);
+document.getElementById('envioModalOverlay').addEventListener('click', e => {
+  if (e.target === document.getElementById('envioModalOverlay')) cerrarModalEnvio();
+});
 
 document.getElementById('envioModalContinuar').addEventListener('click', () => {
   const nombre    = sanitizar(document.getElementById('inputNombre').value);
