@@ -443,18 +443,15 @@ const mpTotal        = document.getElementById('mpTotal');
 
 function abrirModalEnvio() {
   const overlay = document.getElementById('envioModalOverlay');
-  const modal   = document.getElementById('modalDatosEnvio');
   document.getElementById('inputNombre').value    = datosEnvio.nombre;
   document.getElementById('inputDireccion').value = datosEnvio.direccion;
   document.getElementById('inputLocalidad').value = datosEnvio.localidad;
   document.getElementById('envioModalError').style.display = 'none';
-  overlay.classList.add('open');
-  modal.classList.add('open');
+  overlay.style.display = 'flex';
 }
 
 function cerrarModalEnvio() {
-  document.getElementById('envioModalOverlay').classList.remove('open');
-  document.getElementById('modalDatosEnvio').classList.remove('open');
+  document.getElementById('envioModalOverlay').style.display = 'none';
 }
 
 document.getElementById('envioModalClose').addEventListener('click', cerrarModalEnvio);
