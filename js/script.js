@@ -23,6 +23,18 @@ function sanitizar(texto) {
     .substring(0, 200);
 }
 
+function verificarRateLimit() {
+  const ahora = Date.now();
+  const historial = JSON.parse(localStorage.getItem('valhallaRateLimit') || '[]');
+  const recientes = historial.filter(t => ahora - t < 60000); // últimos 60 segundos
+  if (recientes.length >= 3) {
+    return false; // más de 3 intentos en 60 segundos
+  }
+  recientes.push(ahora);
+  localStorage.setItem('valhallaRateLimit', JSON.stringify(recientes));
+  return true;
+}
+
 // ===== PRODUCTOS =====
 const productos = [
   // PROTEÍNAS — potes con imagen real
@@ -541,6 +553,10 @@ async function registrarVentaFirestore(venta) {
 }
 
 function registrarVenta(medioPago) {
+  if (!verificarRateLimit()) {
+    mostrarToast('Demasiados intentos. Esperá un momento antes de continuar.');
+    return;
+  }
   const subtotal      = carrito.reduce((s, i) => s + i.precio * i.cantidad, 0);
   const envioEsGratis = cpDestino && subtotal >= ENVIO_GRATIS_DESDE;
   const envioEfectivo = envioEsGratis ? 0 : costoEnvio;
